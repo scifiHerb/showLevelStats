@@ -41,10 +41,10 @@ namespace showLevelStats.HarmonyPatches
             Debug.Log("show stats"+url);
 
 
-            Test(url, textMesh);
+            GetSongStats(url, textMesh);
         }
 
-        private static async void Test(string url, CurvedTextMeshPro text)
+        private static async void GetSongStats(string url, CurvedTextMeshPro text)
         {
             var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(url); // 非同期にWebリクエストを送信する
