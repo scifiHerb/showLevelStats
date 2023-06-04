@@ -1,0 +1,2 @@
+# showLevelStats
+プレイボタンの下にBSRとVote数を表示するだけのMOD
