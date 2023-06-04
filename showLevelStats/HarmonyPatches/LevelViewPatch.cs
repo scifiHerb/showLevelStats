@@ -18,16 +18,16 @@ namespace showLevelStats.HarmonyPatches
     {
         public static CurvedTextMeshPro textMesh;
 
-        private static void Postfix(IBeatmapLevel level, BeatmapDifficulty defaultDifficulty, BeatmapCharacteristicSO defaultBeatmapCharacteristic, PlayerData playerData, TextMeshProUGUI ____actionButtonText)
+        private static void Postfix(IBeatmapLevel level, BeatmapDifficulty defaultDifficulty, BeatmapCharacteristicSO defaultBeatmapCharacteristic, PlayerData playerData, TextMeshProUGUI ____levelParamsPanel)
         {
             Debug.Log(level.songName + ":" + level.levelID);
 
             //
             if (textMesh == null) textMesh = new GameObject("Text").AddComponent<CurvedTextMeshPro>();
-            textMesh.transform.SetParent(____actionButtonText.transform.parent);
+            textMesh.transform.SetParent(____levelParamsPanel.transform);
             textMesh.alignment = TextAlignmentOptions.Center;
-            textMesh.transform.position = new Vector3(0, 0, 4);
-            textMesh.transform.eulerAngles = new Vector3(0, 23, 0);
+            textMesh.transform.position = new Vector3(2.3F, 0.5F, 3.7F);
+            textMesh.transform.eulerAngles = new Vector3(0, 26, 0);
             textMesh.color = Color.white;
             textMesh.fontSize = 0.1f;
             textMesh.text = "";
@@ -38,7 +38,6 @@ namespace showLevelStats.HarmonyPatches
             if (level.levelID.IndexOf("custom_level") == -1) return;
 
             string url = "https://api.beatsaver.com/maps/hash/" + level.levelID.Substring(13);
-            Debug.Log("show stats"+url);
 
 
             GetSongStats(url, textMesh);
@@ -55,7 +54,8 @@ namespace showLevelStats.HarmonyPatches
 
                 LevelInfomation data = JsonConvert.DeserializeObject<LevelInfomation>(result);
                 text.text = "\n\n\n" + data.id + "(↑<color=#00ff00>" + data.stats.upvotes +
-                    "</color>:↓<color=#ff0000>" + data.stats.downvotes + "</color>)";
+                    "</color>:↓<color=#ff0000>" + data.stats.downvotes + "</color>)\n"+
+                    data.uploaded;
             }
         }
 
