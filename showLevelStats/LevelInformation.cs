@@ -76,7 +76,7 @@ public class Stats
     public int reviews { get; set; }
 }
 
-public class LevelInfomation
+public class LevelInformation
 {
     public string id { get; set; }
     public string name { get; set; }
