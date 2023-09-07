@@ -28,12 +28,13 @@ namespace showLevelStats.HarmonyPatches
             UI.StatsView.instance.Create(__instance.transform.parent.GetComponent<StandardLevelDetailViewController>());
             LevelProfileView.Create(__instance.gameObject);
 
+            StatsView.instance.setText("");
+
             //カスタム曲でない場合return
             if (level.levelID.IndexOf("custom_level") == -1) return;
 
             string url = "https://api.beatsaver.com/maps/hash/" + level.levelID.Substring(13);
 
-            StatsView.instance.setText("");
             GetSongStats(url);
         }
 

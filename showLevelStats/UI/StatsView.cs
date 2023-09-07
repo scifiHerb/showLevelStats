@@ -37,7 +37,7 @@ namespace showLevelStats.UI
             detailView.didDeactivateEvent += ResultsView_didDeactivateEvent;
 
             root.name = "showLevelStats";
-            root.localPosition = new Vector3(45, -33F, 0);
+            root.localPosition = detailView.transform.position + new Vector3(45.5F, -34.5F, 0);
             root.SetParent(screen.transform);
 
             var bsrTextClickable = bsrText.GetComponent<ClickableText>();
