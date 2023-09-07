@@ -25,7 +25,11 @@ namespace showLevelStats.UI
 
         public void Create(StandardLevelDetailViewController detailView)
         {
-            if (root != null) return;
+            if (root != null)
+            {
+
+                return;
+            }
 
             var screen = GameObject.Find("ScreenContainer");
             BSMLParser.instance.Parse(
@@ -37,8 +41,8 @@ namespace showLevelStats.UI
             detailView.didDeactivateEvent += ResultsView_didDeactivateEvent;
 
             root.name = "showLevelStats";
-            root.localPosition = detailView.transform.position + new Vector3(45.5F, -34.5F, 0);
             root.SetParent(screen.transform);
+            root.localPosition = new Vector3(85F, -42.5F, 0);
 
             var bsrTextClickable = bsrText.GetComponent<ClickableText>();
             bsrTextClickable.fontSize = 3;

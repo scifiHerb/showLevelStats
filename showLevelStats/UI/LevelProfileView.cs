@@ -13,6 +13,7 @@ using System.Runtime.Remoting.Contexts;
 using BeatSaberMarkupLanguage.Components;
 using TMPro;
 using System.ComponentModel.Design.Serialization;
+using HMUI;
 
 namespace showLevelStats.UI
 {
@@ -76,6 +77,32 @@ namespace showLevelStats.UI
             await SiraUtil.Extras.Utilities.PauseChamp;
         }
 
+        [UIAction("onClickSongArtwork")]
+        protected async Task onClickSongArtwork()
+        {
+            Plugin.Log.Info("songArt");
+            parserParams?.EmitEvent("show-artwork");
+
+            imageView.sprite = artwork.sprite;
+        }
+
+        [UIAction("onClickMapperArtwork")]
+        protected async Task onClickMapperArtwork()
+        {
+            Plugin.Log.Info("mapperArt");
+            parserParams?.EmitEvent("show-artwork");
+
+            imageView.sprite = mapperIcon.sprite;
+        }
+
+        [UIAction("close-submodal")]
+        protected async Task onClickCloseImageView()
+        {
+            parserParams?.EmitEvent("hide");
+            parserParams?.EmitEvent("show-detail");
+
+        }
+
         [UIParams]
         protected BSMLParserParams parserParams = null;
         [UIComponent("main-modal")]
@@ -98,5 +125,8 @@ namespace showLevelStats.UI
         protected TextMeshProUGUI mapperText = null;
         [UIComponent("mapperDescription")]
         protected TextMeshProUGUI mapperDescription = null;
+
+        [UIComponent("imageView")]
+        protected ImageView imageView = null;
     }
 }
