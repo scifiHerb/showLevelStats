@@ -3,12 +3,12 @@
 
 BSR部分をクリックすると譜面と作者の詳細情報表示できます
 
-# settings
-{
-	"translateCountry":"ja",翻訳先の国コードです、google翻訳のURLから分かると思います。
-	"showBSR":true,BSRの表示
-	"showDate":true,日時の表示
-	"showVotes":true Votesの表示
+# settings  
+{  
+	"translateCountry":"ja",翻訳先の国コードです、google翻訳のURLの国コードと同じです。  
+	"showBSR":true,BSRの表示  
+	"showDate":true,日時の表示  
+	"showVotes":true Votesの表示  
 }
 
 # 不具合
