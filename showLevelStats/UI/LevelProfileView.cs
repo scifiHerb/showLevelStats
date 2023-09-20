@@ -14,19 +14,35 @@ using BeatSaberMarkupLanguage.Components;
 using TMPro;
 using System.ComponentModel.Design.Serialization;
 using HMUI;
+using System.Net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using static BeatmapLevelSO.GetBeatmapLevelDataResult;
+using static IPA.Logging.Logger;
+using showLevelStats;
+using System.Windows.Forms;
+using BeatSaberMarkupLanguage.Components.Settings;
+using showLevelStats.HarmonyPatches;
+using JetBrains.Annotations;
 
 namespace showLevelStats.UI
 {
     internal class LevelProfileView
     {
         static public LevelProfileView instance = new LevelProfileView();
+        static private bool translateFlag = true;
+        private string mapperDesc = "";
+        private string songDesc = "";
 
         public static void Create(GameObject obj)
         {
+            if (instance.root != null) return;
+
             BSMLParser.instance.Parse(
                 Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), $"showLevelStats.UI.LevelProfileView.bsml"),
                 obj, instance
             );
+
             instance.root.name = "levelProfile";
             instance.root.anchoredPosition = new Vector2(100, 100);
         }
@@ -37,14 +53,14 @@ namespace showLevelStats.UI
 
             //set 
             if (level.versions[0] != null) artwork.SetImage(level.versions[0].coverURL);
-            songText.text = $"<color=#00ffff><size=150%>{level.metadata.songName}</size></color>\n";
+            songText.text = $"<color=#00ffff><size=200%>{level.metadata.songName}</size></color>\n";
             if (level.metadata.songSubName != "") songText.text += $"<color=#00bfff>{level.metadata.songSubName}</color>\n";
-            songText.text += $"({level.metadata.songAuthorName})\n" +
-                $"hash[<color=#00FF00>{level.uploader.hash}</color>]\n" +
+            songText.text += $"{level.metadata.songAuthorName} [<color=#00FF00>{level.metadata.levelAuthorName}</color>]\n" +
                 $"BSR[<color=#00ff00>{level.id}</color>] - <color=#00ff00>{level.uploaded}</color>\n" +
                 $"Votes[↑<color=#00ff00>{level.stats.upvotes}</color>:↓<color=#ff0000>{level.stats.downvotes}</color>]";
 
             description.text = level.description;
+            songDesc = level.description;
 
             mapperIcon.SetImage(level.uploader.avatar);
         }
@@ -54,14 +70,14 @@ namespace showLevelStats.UI
             if (artwork == null) return;
 
             //Plugin.Log.Info(mapper.name);
-            mapperText.text = $"<color=#00ffff><size=150%>{mapper.name}</size></color>\n" +
-                $"hash[<color=#00FF00>{mapper.hash}</color>]\n" +
+            mapperText.text = $"<color=#00ffff><size=200%>{mapper.name}</size></color>\n" +
                 $"totalVotes[<color=#00FF00>{mapper.stats.totalUpvotes}</color>,<color=#FF0000>{mapper.stats.totalDownvotes}</color>]\n" +
                 $"totalMaps[<color=#00FF00>{mapper.stats.totalMaps}</color>]\n" +
                 $"[<color=#00FF00>{mapper.stats.firstUpload}</color> - <color=#00FF00>{mapper.stats.lastUpload}</color>]";
 
 
             mapperDescription.text = mapper.description;
+            mapperDesc = mapper.description;
         }
 
         public void showDetail()
@@ -80,7 +96,6 @@ namespace showLevelStats.UI
         [UIAction("onClickSongArtwork")]
         protected async Task onClickSongArtwork()
         {
-            Plugin.Log.Info("songArt");
             parserParams?.EmitEvent("show-artwork");
 
             imageView.sprite = artwork.sprite;
@@ -89,7 +104,6 @@ namespace showLevelStats.UI
         [UIAction("onClickMapperArtwork")]
         protected async Task onClickMapperArtwork()
         {
-            Plugin.Log.Info("mapperArt");
             parserParams?.EmitEvent("show-artwork");
 
             imageView.sprite = mapperIcon.sprite;
@@ -100,7 +114,66 @@ namespace showLevelStats.UI
         {
             parserParams?.EmitEvent("hide");
             parserParams?.EmitEvent("show-detail");
+            ToggleSetting a;
+        }
 
+        [UIAction("original")]
+        protected async Task onOriginal()
+        {
+            description.text = LevelListTableCellSetDataFromLevel.levelInfo.description;
+            mapperDescription.text = LevelListTableCellSetDataFromLevel.mapperInfo.description;
+        }
+
+        [UIAction("translate")]
+        public void onTranslate()
+        {
+            //mapper description
+            try
+            {
+                var w = new WebClient();
+                var result = w.DownloadString($"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl={Settings.Instance.translateLanguage}&dt=t&q={WebUtility.UrlEncode(mapperDesc)}");
+
+                JArray jsonArray = JArray.Parse(result);
+
+                mapperDescription.text = "";
+                foreach (var i in jsonArray)
+                {
+
+                    for (int j = 0; j < i.Count() - 1; j++)
+                    {
+                        if (i[j] != null) mapperDescription.text += i[j][0].ToString();
+                    }
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.Info("エラー: " + ex.Message);
+
+            }
+            try
+            {
+                var w = new WebClient();
+                var result = w.DownloadString($"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl={Settings.Instance.translateLanguage}&dt=t&q={WebUtility.UrlEncode(songDesc)}");
+
+                JArray jsonArray = JArray.Parse(result);
+
+                description.text = "";
+                foreach (var i in jsonArray)
+                {
+
+                    for (int j = 0; j < i.Count() - 1; j++)
+                    {
+                        if (i[j] != null) description.text += i[j][0].ToString();
+                    }
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Plugin.Log.Info("エラー: " + ex.Message);
+            }  
         }
 
         [UIParams]
@@ -119,10 +192,10 @@ namespace showLevelStats.UI
         [UIComponent("description")]
         protected TextMeshProUGUI description = null;
 
-        [UIComponent("mapperIcon")]
-        protected ClickableImage mapperIcon = null;
         [UIComponent("mapperText")]
         protected TextMeshProUGUI mapperText = null;
+        [UIComponent("mapperIcon")]
+        protected ClickableImage mapperIcon = null;
         [UIComponent("mapperDescription")]
         protected TextMeshProUGUI mapperDescription = null;
 

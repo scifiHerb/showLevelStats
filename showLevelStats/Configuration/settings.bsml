@@ -1,0 +1,7 @@
+<settings-container>
+	<dropdown-list-setting text ='translateLanguage' value ='list-choice' choices='list-options'/>
+	<checkbox text='autoTranslate' value='autoTranslate'></checkbox>
+	<checkbox text='showVotes' value='showVotes'></checkbox>
+	<checkbox text='showDate' value='showDate'></checkbox>
+	<checkbox text='showBSR' value='showBSR'></checkbox>
+</settings-container>

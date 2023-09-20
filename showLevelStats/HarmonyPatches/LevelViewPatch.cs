@@ -12,6 +12,7 @@ using System.Security.Cryptography.Xml;
 using static AlphabetScrollInfo;
 using showLevelStats.UI;
 using UnityEngine.Profiling;
+using showLevelStats;
 
 namespace showLevelStats.HarmonyPatches
 {
@@ -21,10 +22,10 @@ namespace showLevelStats.HarmonyPatches
     {
         public static CurvedTextMeshPro textMesh;
         public static LevelInformation levelInfo = null;
+        public static MapperInformation.User mapperInfo = null;
 
         private static void Postfix(IBeatmapLevel level, StandardLevelDetailView __instance, BeatmapDifficulty defaultDifficulty, BeatmapCharacteristicSO defaultBeatmapCharacteristic, PlayerData playerData, TextMeshProUGUI ____actionButtonText)
         {
-            Plugin.Log.Info(__instance.ToString());
             UI.StatsView.instance.Create(__instance.transform.parent.GetComponent<StandardLevelDetailViewController>());
             LevelProfileView.Create(__instance.gameObject);
 
@@ -49,12 +50,14 @@ namespace showLevelStats.HarmonyPatches
 
                 levelInfo = JsonConvert.DeserializeObject<LevelInformation>(result);
 
-                string str = levelInfo.id + "(↑<color=#00ff00>" + levelInfo.stats.upvotes +
-                        "</color>:↓<color=#ff0000>" + levelInfo.stats.downvotes + "</color>)\n" +
-                        levelInfo.updatedAt+"\n\n\n";
+                string str = "";
+                if(Settings.Instance.showBSR)str  += levelInfo.id;
+                if (Settings.Instance.showVotes) str += "(↑<color=#00ff00>" + levelInfo.stats.upvotes + "</color>:↓<color=#ff0000>" + levelInfo.stats.downvotes + "</color>)";
+                if (Settings.Instance.showDate) str += "\n" + levelInfo.updatedAt;
+                str += "\n\n\n";
                 StatsView.instance.setText(str);
-                LevelProfileView.instance.setDetails(levelInfo);
 
+                LevelProfileView.instance.setDetails(levelInfo);
                 GetMapperInfo(levelInfo.uploader.playlistUrl);
             }
         }
@@ -71,10 +74,10 @@ namespace showLevelStats.HarmonyPatches
             {
                 var result = await response.Content.ReadAsStringAsync(); // 非同期にレスポンスを読み込む
 
-                MapperInformation.User data = JsonConvert.DeserializeObject<MapperInformation.User>(result);
-                LevelProfileView.instance.setMapperDetails(data);
-                LevelProfileView.instance.setDetails(levelInfo);
+                mapperInfo = JsonConvert.DeserializeObject<MapperInformation.User>(result);
 
+                LevelProfileView.instance.setMapperDetails(mapperInfo);
+                if(Settings.Instance.autoTranslate)LevelProfileView.instance.onTranslate();
             }
         }
         public enum BeatmapDifficulty

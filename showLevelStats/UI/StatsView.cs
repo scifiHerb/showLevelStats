@@ -27,7 +27,6 @@ namespace showLevelStats.UI
         {
             if (root != null)
             {
-
                 return;
             }
 
@@ -70,7 +69,6 @@ namespace showLevelStats.UI
         [UIAction("onClick")]
         protected async Task onClick()
         {
-            Plugin.Log.Info("onclick");
             LevelProfileView.instance.showDetail();
         }
 
