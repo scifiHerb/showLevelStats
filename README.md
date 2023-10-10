@@ -1,9 +1,6 @@
 # showLevelStats
-![Beat Saber 2023_09_11 16_54_29](https://github.com/scifiHerb/showLevelStats/assets/109839172/cd6976b3-aaa9-46a6-8084-59212a3e017d)
-
 ![Beat Saber 2023_10_10 15_47_19](https://github.com/scifiHerb/showLevelStats/assets/109839172/b0063ce9-58e0-4222-9f6a-125bdc4ef9ae)
-
-![C__Program Files (x86)_Steam_steamapps_common_Beat Saber_UserData_showLevelStats json - Mery 2023_10_10 16_00_59](https://github.com/scifiHerb/showLevelStats/assets/109839172/c55975c9-6edf-4008-87b2-77d0c55bc264)
+![Beat Saber 2023_09_11 16_54_29](https://github.com/scifiHerb/showLevelStats/assets/109839172/cd6976b3-aaa9-46a6-8084-59212a3e017d)
 
 # 説明
 プレイボタンの下に譜面のBSRや日時、Vote数などの情報を表示するMODです。
