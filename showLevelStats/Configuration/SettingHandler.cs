@@ -10,33 +10,6 @@ namespace showLevelStats
 {
     class SettingsHandler : PersistentSingleton<SettingsHandler>
     {
-        [UIValue("showVotes")]
-        public bool showVotes
-        {
-            get => Settings.Instance.showVotes;
-            set
-            {
-                Settings.Instance.showVotes = value;
-            }
-        }
-        [UIValue("showDate")]
-        public bool showDate
-        {
-            get => Settings.Instance.showDate;
-            set
-            {
-                Settings.Instance.showDate = value;
-            }
-        }
-        [UIValue("showBSR")]
-        public bool showBSR
-        {
-            get => Settings.Instance.showBSR;
-            set
-            {
-                Settings.Instance.showBSR = value;
-            }
-        }
         [UIValue("autoTranslate")]
         public bool autoTranslate
         {

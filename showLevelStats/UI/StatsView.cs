@@ -41,7 +41,7 @@ namespace showLevelStats.UI
 
             root.name = "showLevelStats";
             root.SetParent(screen.transform);
-            root.localPosition = new Vector3(85F, -42.5F, 0);
+            root.localPosition = new Vector3(Settings.Instance.offset_x, Settings.Instance.offset_y, Settings.Instance.offset_z);
 
             var bsrTextClickable = bsrText.GetComponent<ClickableText>();
             bsrTextClickable.fontSize = 3;

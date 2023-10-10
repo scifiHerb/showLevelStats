@@ -17,30 +17,45 @@ using showLevelStats;
 namespace showLevelStats.HarmonyPatches
 {
     [HarmonyPatch(typeof(StandardLevelDetailView))]
+    [HarmonyPatch("SetContentForBeatmapDataAsync", MethodType.Normal)]
+    internal class difficultySelected
+    {
+        public static IDifficultyBeatmap diff = null;
+        private static void Postfix(IDifficultyBeatmap ____selectedDifficultyBeatmap)
+        {
+            diff = ____selectedDifficultyBeatmap;
+            Plugin.Log.Info("selectdiff");
+            LevelListTableCellSetDataFromLevel.GetSongStats();
+        }
+    }
+
+    [HarmonyPatch(typeof(StandardLevelDetailView))]
     [HarmonyPatch("SetContent", MethodType.Normal)]
     internal class LevelListTableCellSetDataFromLevel
     {
         public static CurvedTextMeshPro textMesh;
         public static LevelInformation levelInfo = null;
         public static MapperInformation.User mapperInfo = null;
+        public static IBeatmapLevel iLevel = null;
 
-        private static void Postfix(IBeatmapLevel level, StandardLevelDetailView __instance, BeatmapDifficulty defaultDifficulty, BeatmapCharacteristicSO defaultBeatmapCharacteristic, PlayerData playerData, TextMeshProUGUI ____actionButtonText)
+        private static void Postfix(IBeatmapLevel level, IDifficultyBeatmap ____selectedDifficultyBeatmap, StandardLevelDetailView __instance, BeatmapDifficulty defaultDifficulty, BeatmapCharacteristicSO defaultBeatmapCharacteristic, PlayerData playerData, TextMeshProUGUI ____actionButtonText)
         {
+            iLevel = level;
             UI.StatsView.instance.Create(__instance.transform.parent.GetComponent<StandardLevelDetailViewController>());
             LevelProfileView.Create(__instance.gameObject);
 
             StatsView.instance.setText("");
 
-            //カスタム曲でない場合return
-            if (level.levelID.IndexOf("custom_level") == -1) return;
-
-            string url = "https://api.beatsaver.com/maps/hash/" + level.levelID.Substring(13);
-
-            GetSongStats(url);
+            GetSongStats();
         }
 
-        private static async void GetSongStats(string url)
+        public static async void GetSongStats()
         {
+            //カスタム曲でない場合return
+            if (iLevel.levelID.IndexOf("custom_level") == -1) return;
+
+            string url = "https://api.beatsaver.com/maps/hash/" + iLevel.levelID.Substring(13);
+
             var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(url); // 非同期にWebリクエストを送信する
 
@@ -50,12 +65,27 @@ namespace showLevelStats.HarmonyPatches
 
                 levelInfo = JsonConvert.DeserializeObject<LevelInformation>(result);
 
-                string str = "";
-                if(Settings.Instance.showBSR)str  += levelInfo.id;
-                if (Settings.Instance.showVotes) str += "(↑<color=#00ff00>" + levelInfo.stats.upvotes + "</color>:↓<color=#ff0000>" + levelInfo.stats.downvotes + "</color>)";
-                if (Settings.Instance.showDate) str += "\n" + levelInfo.updatedAt;
-                str += "\n\n\n";
-                StatsView.instance.setText(str);
+                //debug
+                float offset = difficultySelected.diff.noteJumpStartBeatOffset;
+                float jumpDistance = CalculateJumpDistance(difficultySelected.diff.level.beatsPerMinute, difficultySelected.diff.noteJumpMovementSpeed, difficultySelected.diff.noteJumpStartBeatOffset);
+                float reactionTime = jumpDistance * 500 / difficultySelected.diff.noteJumpMovementSpeed;
+                string textConfig = Settings.Instance.textConfig;
+
+                textConfig = textConfig.Replace("{BSR}", levelInfo.id.ToString());
+                textConfig = textConfig.Replace("{upvotes}", levelInfo.stats.upvotes.ToString());
+                textConfig = textConfig.Replace("{downvotes}", levelInfo.stats.downvotes.ToString());
+                textConfig = textConfig.Replace("{uploadDate}", levelInfo.uploaded.ToString());
+                textConfig = textConfig.Replace("{JD}", jumpDistance.ToString("F2"));
+                textConfig = textConfig.Replace("{RT}", reactionTime.ToString("F0"));
+                textConfig = textConfig.Replace("{NJS}", difficultySelected.diff.noteJumpMovementSpeed.ToString());
+                textConfig = textConfig.Replace("{ranked}", ((levelInfo.ranked) ? "rank" : ""));
+                textConfig = textConfig.Replace("{totalPlays}", levelInfo.stats.plays.ToString());
+                textConfig = textConfig.Replace("{downloads}", levelInfo.stats.downloads.ToString());
+                textConfig = textConfig.Replace("{hash}", levelInfo.uploader.hash.ToString());
+                textConfig = textConfig.Replace("{name}", levelInfo.name.ToString());
+                textConfig = textConfig.Replace("{description}", levelInfo.description.ToString());
+
+                StatsView.instance.setText(textConfig);
 
                 LevelProfileView.instance.setDetails(levelInfo);
                 GetMapperInfo(levelInfo.uploader.playlistUrl);
@@ -79,6 +109,27 @@ namespace showLevelStats.HarmonyPatches
                 LevelProfileView.instance.setMapperDetails(mapperInfo);
                 if(Settings.Instance.autoTranslate)LevelProfileView.instance.onTranslate();
             }
+        }
+        public static float CalculateJumpDistance(float bpm, float njs, float offset)
+        {
+            float jumpdistance = 0f; // In case
+            float halfjump = 4f;
+            float num = 60f / bpm;
+
+            // Need to repeat this here even tho it's in BeatmapInfo because sometimes we call this function directly
+            if (njs <= 0.01) // Is it ok to == a 0f?
+                njs = 10f;
+
+            while (njs * num * halfjump > 17.999)
+                halfjump /= 2;
+
+            halfjump += offset;
+            if (halfjump < 0.25f)
+                halfjump = 0.25f;
+
+            jumpdistance = njs * num * halfjump * 2;
+
+            return jumpdistance;
         }
         public enum BeatmapDifficulty
         {
