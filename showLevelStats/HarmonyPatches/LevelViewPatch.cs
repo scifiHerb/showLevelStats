@@ -24,7 +24,7 @@ namespace showLevelStats.HarmonyPatches
         private static void Postfix(IDifficultyBeatmap ____selectedDifficultyBeatmap)
         {
             diff = ____selectedDifficultyBeatmap;
-            Plugin.Log.Info("selectdiff");
+            LevelProfileView.instance.clearDetails();
             LevelListTableCellSetDataFromLevel.GetSongStats();
         }
     }
@@ -45,7 +45,7 @@ namespace showLevelStats.HarmonyPatches
             LevelProfileView.Create(__instance.gameObject);
 
             StatsView.instance.setText("");
-
+            LevelProfileView.instance.clearDetails();
             GetSongStats();
         }
 
@@ -54,7 +54,8 @@ namespace showLevelStats.HarmonyPatches
             //カスタム曲でない場合return
             if (iLevel.levelID.IndexOf("custom_level") == -1) return;
 
-            string url = "https://api.beatsaver.com/maps/hash/" + iLevel.levelID.Substring(13);
+            //修正
+            string url = "https://api.beatsaver.com/maps/hash/" + iLevel.levelID.Substring(13, 40);
 
             var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(url); // 非同期にWebリクエストを送信する
@@ -64,6 +65,7 @@ namespace showLevelStats.HarmonyPatches
                 var result = await response.Content.ReadAsStringAsync(); // 非同期にレスポンスを読み込む
 
                 levelInfo = JsonConvert.DeserializeObject<LevelInformation>(result);
+                if (iLevel.levelID.Substring(13, 40).ToUpper() != levelInfo.versions[0].hash.ToUpper()) { Plugin.Log.Info(iLevel.levelID + ":" + levelInfo.versions[0].hash); return; }
 
                 //debug
                 float offset = difficultySelected.diff.noteJumpStartBeatOffset;
@@ -89,6 +91,8 @@ namespace showLevelStats.HarmonyPatches
 
                 LevelProfileView.instance.setDetails(levelInfo);
                 GetMapperInfo(levelInfo.uploader.playlistUrl);
+
+
             }
         }
         private static async void GetMapperInfo(string url)

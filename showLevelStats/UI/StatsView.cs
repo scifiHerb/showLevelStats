@@ -69,6 +69,8 @@ namespace showLevelStats.UI
         [UIAction("onClick")]
         protected async Task onClick()
         {
+
+            LevelProfileView.instance.setDetails(HarmonyPatches.LevelListTableCellSetDataFromLevel.levelInfo);
             LevelProfileView.instance.showDetail();
         }
 

@@ -47,10 +47,21 @@ namespace showLevelStats.UI
             instance.root.anchoredPosition = new Vector2(100, 100);
         }
 
+        public void clearDetails()
+        {
+            if (artwork == null) return;
+            artwork.SetImage("");
+            mapperIcon.SetImage("");
+            songText.text = "";
+            mapperText.text = "";
+            description.text = "";
+            mapperDescription.text = "";
+
+        }
         public void setDetails(LevelInformation level)
         {
             if (artwork == null) return;
-
+            Plugin.Log.Info(level.name + ":" + level.uploader.hash);
             //set 
             if (level.versions[0] != null) artwork.SetImage(level.versions[0].coverURL);
             songText.text = $"<color=#00ffff><size=200%>{level.metadata.songName}</size></color>\n";
@@ -61,8 +72,6 @@ namespace showLevelStats.UI
 
             description.text = level.description;
             songDesc = level.description;
-
-            mapperIcon.SetImage(level.uploader.avatar);
         }
 
         public void setMapperDetails(MapperInformation.User mapper)
@@ -78,6 +87,7 @@ namespace showLevelStats.UI
 
             mapperDescription.text = mapper.description;
             mapperDesc = mapper.description;
+            mapperIcon.SetImage(mapper.avatar);
         }
 
         public void showDetail()
