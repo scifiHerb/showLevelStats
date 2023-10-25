@@ -61,7 +61,6 @@ namespace showLevelStats.UI
         public void setDetails(LevelInformation level)
         {
             if (artwork == null) return;
-            Plugin.Log.Info(level.name + ":" + level.uploader.hash);
             //set 
             if (level.versions[0] != null) artwork.SetImage(level.versions[0].coverURL);
             songText.text = $"<color=#00ffff><size=200%>{level.metadata.songName}</size></color>\n";
@@ -78,7 +77,6 @@ namespace showLevelStats.UI
         {
             if (artwork == null) return;
 
-            //Plugin.Log.Info(mapper.name);
             mapperText.text = $"<color=#00ffff><size=200%>{mapper.name}</size></color>\n" +
                 $"totalVotes[<color=#00FF00>{mapper.stats.totalUpvotes}</color>,<color=#FF0000>{mapper.stats.totalDownvotes}</color>]\n" +
                 $"totalMaps[<color=#00FF00>{mapper.stats.totalMaps}</color>]\n" +
