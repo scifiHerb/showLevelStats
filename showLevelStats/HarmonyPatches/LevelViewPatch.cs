@@ -107,15 +107,12 @@ namespace showLevelStats.HarmonyPatches
         }
         private static string getFirstNoteDirectionText()
         {
-            Plugin.Log.Info("test");
-            //test
             NoteCutDirection? firstLeftDirection = null;
             NoteCutDirection? firstRightDirection = null;
             foreach (var a in difficultySelected.diffData.beatmapSaveData.colorNotes)
             {
                 if (firstLeftDirection == null && a.color == BeatmapSaveDataVersion3.BeatmapSaveData.NoteColorType.ColorA)
                 {
-                    Plugin.Log.Info(a.cutDirection.ToString());
                     firstLeftDirection = a.cutDirection;
                 }
                 if (firstRightDirection == null && a.color == BeatmapSaveDataVersion3.BeatmapSaveData.NoteColorType.ColorB)
