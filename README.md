@@ -51,16 +51,19 @@
 
 またUnityのRichTextを使用しているので書式設定、色設定などそのまま入力することで反映させることが出来ます。  
 # 変数類
-"{BSR}",   
-"{upvotes}",   
-"{downvotes}",   
-"{uploadDate}",   
-"{JD}",JumpDistance  
-"{RT}",ReactionTime  
-"{NJS}",noteJumpMovementSpeed  
+"{BSR}",levelID   
+"{upvotes}",上評価   
+"{downvotes}",下評価   
+"{uploadDate}",投稿日時   
+"{JD}",ジャンプディスタンス  
+"{RT}",リアクションタイム  
+"{NJS}",ノーツジャンプスピード  
 "{ranked}",   
 "{totalPlays}",   
 "{downloads}",   
 "{hash}",   
 "{name}",   
 "{description}",   
+"{warningCrouchWalls}",しゃがみ壁が存在する場合、始めに来るまでの時間とその総数を表示します  
+"{firstNoteCutDirection}",一番初めに来るノーツの方向を表示します  
+
