@@ -1,13 +1,20 @@
 # showLevelStats
-![Beat Saber 2023_10_10 15_47_19](https://github.com/scifiHerb/showLevelStats/assets/109839172/b0063ce9-58e0-4222-9f6a-125bdc4ef9ae)
-![Beat Saber 2023_09_11 16_54_29](https://github.com/scifiHerb/showLevelStats/assets/109839172/cd6976b3-aaa9-46a6-8084-59212a3e017d)
+![Beat Saber 2023_10_25 16_44_46](https://github.com/scifiHerb/showLevelStats/assets/109839172/95263110-bbcc-4de4-9e8c-58e080efdc27)
+![Beat Saber 2023_10_25 16_45_03](https://github.com/scifiHerb/showLevelStats/assets/109839172/a3d8b876-7703-4429-a0f2-e67021b42806)
+
 
 # 説明
 プレイボタンの下に譜面のBSRや日時、Vote数などの情報を表示するMODです。
 付加的な機能として BSR部分をクリックすると譜面と作者の詳細情報を表示できます。
 譜面や作者の説明文はGoogle翻訳を通じて翻訳する機能をつけています、ModSettingsで言語設定が出来ますが取得URLに国コードをつけているだけなので直接設定ファイルをいじればどの言語でも対応できます。
 
+(3.0)  
+表示できる情報に、しゃがみ壁がある場合の注意表示と始めのノーツの方向を追加しました。  
+
 # ChangeLog  
+2023-10-24  
+表示できる情報に、しゃがみ壁がある場合の注意表示と始めのノーツの方向を追加しました。  
+
 2023-10-10  
 ・ReactionTime、JumpDistanceなどの表示を追加  
 ・テキストの設定方式を、文字列の指定した場所に変数を割り当てる方式に変更  
