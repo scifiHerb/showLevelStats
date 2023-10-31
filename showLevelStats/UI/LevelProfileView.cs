@@ -50,8 +50,6 @@ namespace showLevelStats.UI
         public void clearDetails()
         {
             if (artwork == null) return;
-            artwork.SetImage("");
-            mapperIcon.SetImage("");
             songText.text = "";
             mapperText.text = "";
             description.text = "";

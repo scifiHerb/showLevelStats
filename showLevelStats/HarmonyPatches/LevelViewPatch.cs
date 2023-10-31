@@ -27,10 +27,12 @@ namespace showLevelStats.HarmonyPatches
 
         private static void Postfix(IDifficultyBeatmap ____selectedDifficultyBeatmap, IBeatmapLevel ____level)
         {
+            if (____selectedDifficultyBeatmap.level.levelID.IndexOf("custom_level") == -1) return;
             foreach(var l in ____selectedDifficultyBeatmap.level.previewDifficultyBeatmapSets)
             {
+                if (l.beatmapCharacteristic.name == "") continue;
                 var temp = ____selectedDifficultyBeatmap.level.beatmapLevelData.GetDifficultyBeatmap(l.beatmapCharacteristic, ____selectedDifficultyBeatmap.difficulty);
-                diffData = ((CustomDifficultyBeatmap)temp);
+                diffData = ((temp!=null)?((CustomDifficultyBeatmap)temp):null);
             }
 
             diff = ____selectedDifficultyBeatmap;
@@ -62,8 +64,8 @@ namespace showLevelStats.HarmonyPatches
         public static async void GetSongStats()
         {
             //カスタム曲でない場合return
+            if (iLevel == null) return;
             if (iLevel.levelID.IndexOf("custom_level") == -1) return;
-
             //修正
             string url = "https://api.beatsaver.com/maps/hash/" + iLevel.levelID.Substring(13, 40);
 
@@ -107,8 +109,10 @@ namespace showLevelStats.HarmonyPatches
         }
         private static string getFirstNoteDirectionText()
         {
+            if (difficultySelected.diffData == null) return "";
             NoteCutDirection? firstLeftDirection = null;
             NoteCutDirection? firstRightDirection = null;
+
             foreach (var a in difficultySelected.diffData.beatmapSaveData.colorNotes)
             {
                 if (firstLeftDirection == null && a.color == BeatmapSaveDataVersion3.BeatmapSaveData.NoteColorType.ColorA)
@@ -152,9 +156,11 @@ namespace showLevelStats.HarmonyPatches
         }
         private static string getWarningCrouchWallsText()
         {
+            if (difficultySelected.diffData == null) return "";
+
             float firstWallBeat = -1;
             int chrouchWallsCount = 0;
-            firstWallBeat = CheckForCrouchWalls(difficultySelected.diffData.beatmapSaveData.obstacles, ref chrouchWallsCount);
+            firstWallBeat = CheckForCrouchWalls2(difficultySelected.diffData.beatmapSaveData.obstacles, ref chrouchWallsCount);
             if (firstWallBeat == -1) return "";
 
             var firstWallTime = firstWallBeat * (60.0F / difficultySelected.diffData.beatsPerMinute);
@@ -205,6 +211,48 @@ namespace showLevelStats.HarmonyPatches
 
                 // Extend wall lengths by 120ms so that staggered crouchwalls that dont overlap are caught
                 wallExistence[isLeftHalf ? 0 : 1] = Math.Max(wallExistence[isLeftHalf ? 0 : 1], o.beat + o.duration + 0.12f);
+            }
+            return beat;
+        }
+        public static float CheckForCrouchWalls2(List<BeatmapSaveDataVersion3.BeatmapSaveData.ObstacleData> obstacles, ref int count)
+        {
+            if (obstacles == null || obstacles.Count == 0)
+                return -1;
+
+            var wallExistence = new float[2];
+            float beat = -1;
+
+            foreach (var o in obstacles)
+            {
+                //check basic crouch walls
+                //upper wall
+                if (o.line == 1 && o.layer == 2 && o.width == 2 && o.height == 3)
+                {
+                    count++;
+                    if (beat == -1) beat = o.beat;
+                    continue;
+                }
+                //middle upper wall
+                if (o.line == 0 && o.layer == 2 && o.width == 4 && o.height == 3)
+                {
+                    count++;
+                    if (beat == -1) beat = o.beat;
+                    continue;
+                }
+                //leftside wall
+                if (o.line == 0 && o.layer == 2 && o.width == 3 && o.height == 3)
+                {
+                    count++;
+                    if (beat == -1) beat = o.beat;
+                    continue;
+                }
+                //rightside wall
+                if (o.line == 1 && o.layer == 2 && o.width == 3 && o.height == 3)
+                {
+                    count++;
+                    if (beat == -1) beat = o.beat;
+                    continue;
+                }
             }
             return beat;
         }
